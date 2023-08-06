@@ -1,4 +1,5 @@
 import React from 'react';
+import { getRandomAnimalFact } from '../utils/api';
 import Row from './_base/Row';
 
 /**
@@ -15,6 +16,18 @@ import Row from './_base/Row';
 function AnimalFactCard({ animal }) {
   const [image, setImage] = React.useState(null);
   const [fact, setFact] = React.useState(null);
+
+  React.useEffect(() => {  // useEffect harus berjalan secara sinkronus untuk menghindari race conditions. Jangan pernah gunakan keyword async.
+    getRandomAnimalFact(animal).then(({ fact, image }) => {
+      setFact(fact)
+      setImage(image)
+    })
+
+    return () => {
+      setFact(null)  // memanfaatkan fungsi cleanup untuk re-set state ke null supaya indikasi loading muncul
+      setImage(null)
+    }
+  }, [animal])
 
   return (
     <section>
